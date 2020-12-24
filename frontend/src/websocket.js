@@ -1,5 +1,3 @@
-import { object } from 'prop-types';
-
 class WebSocketService {
     static instance = null;
     callbacks = {};
@@ -10,24 +8,30 @@ class WebSocketService {
         }
         return WebSocketService.instance;
     }
+
     constructor() {
         this.socketRef = null;
     }
 
     connect() {
-        const path = 'ws://localhost:8000/ws/chat/test/';
+        const path = 'ws://127.0.0.1:8000/ws/chat/test/';
         this.socketRef = new WebSocket(path);
         this.socketRef.onopen = () => {
-            console.log('Websocket open');
+            console.log('WebSocket open');
         };
+        this.socketNewMessage(
+            JSON.stringify({
+                command: 'fetch_messages',
+            })
+        );
         this.socketRef.onmessage = (e) => {
-            console.log('This is sending a message');
+            this.socketNewMessage(e.data);
         };
         this.socketRef.onerror = (e) => {
             console.log(e.message);
         };
         this.socketRef.onclose = () => {
-            console.log('Websocket closed');
+            console.log("WebSocket closed let's reopen");
             this.connect();
         };
     }
@@ -38,7 +42,7 @@ class WebSocketService {
         if (Object.keys(this.callbacks).length === 0) {
             return;
         }
-        if (command === 'message') {
+        if (command === 'messages') {
             this.callbacks[command](parsedData.messages);
         }
         if (command === 'new_message') {
@@ -46,24 +50,19 @@ class WebSocketService {
         }
     }
 
+    fetchMessages(username) {
+        this.sendMessage({ command: 'fetch_messages', username: username });
+    }
+
     newChatMessage(message) {
-        this.sendMessages({ command: 'fetch_messages', username: username });
+        this.sendMessage({ command: 'new_message', from: message.from, message: message.content });
     }
-    newChatMessage(message) {
-        this.sendMessages({
-            command: 'new_messages',
-            username: username,
-            from: message.from,
-            message: message.content,
-        });
-    }
-    state() {
-        return this.socketRef.readyState;
-    }
+
     addCallbacks(messagesCallback, newMessageCallback) {
-        this.callback['messages'] = messagesCallback;
-        this.callback['new_message'] = newMessageCallback;
+        this.callbacks['messages'] = messagesCallback;
+        this.callbacks['new_message'] = newMessageCallback;
     }
+
     sendMessage(data) {
         try {
             this.socketRef.send(JSON.stringify({ ...data }));
@@ -71,6 +70,11 @@ class WebSocketService {
             console.log(err.message);
         }
     }
+
+    state() {
+        return this.socketRef.readyState;
+    }
+
     waitForSocketConnection(callback) {
         const socket = this.socketRef;
         const recursion = this.waitForSocketConnection;

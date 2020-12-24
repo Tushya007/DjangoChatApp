@@ -4,6 +4,7 @@ async-timeout==3.0.1
 attrs==20.3.0
 autobahn==20.12.1
 Automat==20.2.0
+autopep8==1.5.4
 cffi==1.14.4
 channels==3.0.2
 channels-redis==3.2.0
@@ -18,13 +19,17 @@ incremental==17.5.0
 msgpack==1.0.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
+pycodestyle==2.6.0
 pycparser==2.20
 PyHamcrest==2.0.2
 pyOpenSSL==20.0.0
 pytz==2020.4
+selenium==3.141.0
 service-identity==18.1.0
 six==1.15.0
 sqlparse==0.4.1
+toml==0.10.2
 Twisted @ file:///C:/Users/Tushya/Downloads/Twisted-20.3.0-cp39-cp39-win_amd64.whl
 txaio==20.4.1
+urllib3==1.26.2
 zope.interface==5.2.0
